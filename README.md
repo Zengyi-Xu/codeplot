@@ -24,11 +24,30 @@ python codeplot.py
 - **组合排版（v5）**：支持多段子图脚本 + 排版组合，一键生成论文级组图。
 - **导出**：支持保存脚本、导出单图 PNG/SVG、导出组图 PDF/PNG。
 
+## 打包成 Windows 可执行文件（含开始菜单快捷方式）
+
+```bat
+build_exe.bat
+```
+
+打包流程：
+1. 自动生成 `icon.ico`（使用 📊 emoji）。
+2. 使用 PyInstaller 生成 `dist/CodePlot/CodePlot.exe`（无控制台窗口）。
+3. 运行 `create_shortcut.ps1` 在开始菜单创建 `CodePlot` 快捷方式。
+
+打包完成后，可直接从开始菜单启动 CodePlot。
+
 ## 文件结构
 
 ```
 codeplot/
 ├── codeplot.py              # 当前主程序（v5，图集排版模式）
+├── compose_figure.py        # 组合排版引擎
+├── compose_settings.json    # 组合排版默认设置
+├── icon.ico                 # 应用图标（📊 emoji）
+├── make_icon.py             # 图标生成脚本
+├── build_exe.bat            # Windows 打包脚本
+├── create_shortcut.ps1      # 创建开始菜单快捷方式
 ├── README.md                # 本说明
 ├── DEVLOG.md                # 开发日志
 └── archive/                 # 历史版本
