@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-compose_figure.py — 把多张 SVG 子图组合排版成一张总图（纯矢量）
+compose_figure.py — Compose multiple SVG sub-figures into one combined figure (pure vector)
 
-用法:
-    python compose_figure.py                     # 默认读取 .codeplot_gallery 图集
-    python compose_figure.py a.svg b.svg c.svg   # 或指定 SVG 文件（按给定顺序）
+Usage:
+    python compose_figure.py                     # Read .codeplot_gallery by default
+    python compose_figure.py a.svg b.svg c.svg   # Or specify SVG files (in given order)
 
-所有排版参数都在下面 CONFIG 区域，直接改值后重新运行即可：
-  - 序号: 字体、字号、字重、颜色、位置（四角）、衬底、编号样式
-  - 布局: "grid"（网格，子图统一大小）或 "custom"（逐张指定位置和大小）
-  - 输出: SVG 矢量图；若安装了 cairosvg 可同时导出 PDF/PNG
+All layout parameters are in the CONFIG block below; edit values and rerun:
+  - Labels: font family, size, weight, color, position (four corners), background, style
+  - Layout: "grid" (uniform panels) or "custom" (specify position/size per panel)
+  - Output: SVG vector; if cairosvg is installed, also export PDF/PNG
 
-原理: 每张子图 SVG 作为嵌套 <svg x y width height viewBox> 放入容器 SVG，
-全程矢量、不栅格化；序号在组合时添加，子图文件本身保持干净。
+Principle: each sub-figure SVG is embedded as a nested <svg x y width height viewBox> in a container SVG.
+Fully vector, no rasterization; labels are added during composition, keeping sub-figure files clean.
 """
 
 import os
@@ -21,43 +21,43 @@ import sys
 import json
 
 # ════════════════════════════════════════════════════════════════
-# CONFIG — 排版参数（改这里）
+# CONFIG — layout parameters (edit here)
 # ════════════════════════════════════════════════════════════════
 
-# ── 输出 ──
-OUTPUT_SVG = "combined_figure.svg"   # 输出文件名
-EXPORT_PDF = False                   # 同时导出 PDF（需要 pip install cairosvg）
-EXPORT_PNG = False                   # 同时导出 PNG（需要 cairosvg）
-PNG_DPI = 300                        # PNG 分辨率
-BACKGROUND = "white"                 # 总图背景色，None 表示透明
+# ── Output ──
+OUTPUT_SVG = "combined_figure.svg"   # Output file name
+EXPORT_PDF = False                   # Also export PDF (requires pip install cairosvg)
+EXPORT_PNG = False                   # Also export PNG (requires cairosvg)
+PNG_DPI = 300                        # PNG resolution
+BACKGROUND = "white"                 # Combined figure background; None means transparent
 
-# ── 序号 (a)(b)(c) ──
-LABEL_FONT_FAMILY = "Arial"          # 序号字体，如 "Arial" / "Times New Roman" / "HONOR Sans"
-LABEL_FONT_SIZE = 20                 # 字号 (pt)
+# ── Labels (a)(b)(c) ──
+LABEL_FONT_FAMILY = "Liberation Sans"          # Label font family, e.g. "Liberation Sans" / "Arial" / "Times New Roman"
+LABEL_FONT_SIZE = 20                 # Font size (pt)
 LABEL_FONT_WEIGHT = "bold"           # normal / bold
 LABEL_COLOR = "black"
-LABEL_STYLE = "lower"                # 编号样式: "lower" (a) / "upper" (A) / "number" (1)
-LABEL_BRACKETS = True                # True → (a)；False → a
+LABEL_STYLE = "lower"                # Label style: "lower" (a) / "upper" (A) / "number" (1)
+LABEL_BRACKETS = True                # True → (a); False → a
 LABEL_POSITION = "top-left"          # top-left / top-right / bottom-left / bottom-right
-LABEL_OFFSET_X = 6                   # 距子图边缘的水平距离 (pt)
-LABEL_OFFSET_Y = 6                   # 距子图边缘的垂直距离 (pt)
-LABEL_BACKGROUND = True              # 序号后加白色衬底（压在复杂图上时更清晰）
+LABEL_OFFSET_X = 6                   # Horizontal distance from panel edge (pt)
+LABEL_OFFSET_Y = 6                   # Vertical distance from panel edge (pt)
+LABEL_BACKGROUND = True              # Add white background behind labels (clearer over complex figures)
 
-# ── 布局方式: "grid" 或 "custom" ──
+# ── Layout mode: "grid" or "custom" ──
 LAYOUT = "grid"
 
-# grid 布局参数（子图统一大小，等比缩放到格子内居中）
+# Grid layout parameters (panels are uniformly sized and scaled to fit cells)
 GRID_ROWS = 2
 GRID_COLS = 2
-PANEL_WIDTH = 420                    # 每个格子的宽 (pt)
-PANEL_HEIGHT = 320                   # 每个格子的高 (pt)
-H_SPACING = 24                       # 列间距 (pt)
-V_SPACING = 24                       # 行间距 (pt)
-MARGIN = 20                          # 总图四周边距 (pt)
+PANEL_WIDTH = 420                    # Width of each cell (pt)
+PANEL_HEIGHT = 320                   # Height of each cell (pt)
+H_SPACING = 24                       # Column spacing (pt)
+V_SPACING = 24                       # Row spacing (pt)
+MARGIN = 20                          # Margin around combined figure (pt)
 
-# custom 布局参数（LAYOUT = "custom" 时使用）
-# 每张图一个 dict: x, y 为左上角坐标 (pt)，w, h 为显示尺寸 (pt，等比缩放适配)
-# "label" 可覆盖自动序号；设为 None 则该图不加序号
+# Custom layout parameters (used when LAYOUT = "custom")
+# One dict per figure: x, y are top-left coordinates (pt); w, h are display sizes (pt, scaled to fit)
+# "label" can override automatic labels; set to None to omit the label for that panel
 CUSTOM_PANELS = [
     {"x": 20,  "y": 20,  "w": 420, "h": 320},
     {"x": 460, "y": 20,  "w": 420, "h": 320},
@@ -66,12 +66,12 @@ CUSTOM_PANELS = [
 ]
 
 # ════════════════════════════════════════════════════════════════
-# 以下为组合逻辑，一般不需要改
+# Composition logic below; usually no need to edit
 # ════════════════════════════════════════════════════════════════
 
 
 def load_svg_entry(path):
-    """读取 SVG 文件，返回 {viewBox, aspect, inner}；失败返回 None"""
+    """Read SVG file, return {viewBox, aspect, inner}; return None on failure"""
     try:
         with open(path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -85,7 +85,7 @@ def load_svg_entry(path):
         else:
             return None
     else:
-        # 没有 viewBox 时退化为用 width/height 属性估算
+        # Fallback to width/height attributes when no viewBox is present
         mw = re.search(r'width="([\d.]+)', content)
         mh = re.search(r'height="([\d.]+)', content)
         if not (mw and mh):
@@ -101,7 +101,7 @@ def load_svg_entry(path):
 
 
 def default_gallery_svgs():
-    """按图集索引顺序返回 .codeplot_gallery 中的 SVG 路径"""
+    """Return SVG paths from .codeplot_gallery in index order"""
     base = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".codeplot_gallery")
     idx_path = os.path.join(base, "gallery_index.json")
     paths = []
@@ -134,7 +134,7 @@ def make_label(i):
 
 
 def label_elements(label, px, py, pw, ph):
-    """生成序号的 SVG 元素（可选白色衬底），px,py,pw,ph 为子图显示区域"""
+    """Generate SVG elements for labels (optional white background); px,py,pw,ph are panel display area"""
     fs = LABEL_FONT_SIZE
     if LABEL_POSITION.endswith("right"):
         lx = px + pw - LABEL_OFFSET_X
@@ -143,9 +143,9 @@ def label_elements(label, px, py, pw, ph):
         lx = px + LABEL_OFFSET_X
         anchor = "start"
     if LABEL_POSITION.startswith("bottom"):
-        ly = py + ph - LABEL_OFFSET_Y          # 基线
+        ly = py + ph - LABEL_OFFSET_Y          # baseline
     else:
-        ly = py + LABEL_OFFSET_Y + fs          # 基线
+        ly = py + LABEL_OFFSET_Y + fs          # baseline
 
     parts = []
     if LABEL_BACKGROUND:
@@ -171,12 +171,12 @@ def label_elements(label, px, py, pw, ph):
 
 
 def compute_layout(n):
-    """返回 (panels, total_w, total_h)；panels 为 [{x,y,w,h,label}]"""
+    """Return (panels, total_w, total_h); panels is [{x,y,w,h,label}]"""
     if LAYOUT == "custom":
         if n > len(CUSTOM_PANELS):
             raise SystemExit(
-                f"custom 布局只定义了 {len(CUSTOM_PANELS)} 个位置，但有 {n} 张图，"
-                f"请在 CUSTOM_PANELS 中补齐")
+                f"custom layout only defines {len(CUSTOM_PANELS)} positions, but there are {n} figures;"
+                f"please add more entries to CUSTOM_PANELS")
         panels = []
         for i in range(n):
             p = dict(CUSTOM_PANELS[i])
@@ -186,10 +186,10 @@ def compute_layout(n):
         total_h = max(p["y"] + p["h"] for p in panels) + MARGIN
         return panels, total_w, total_h
 
-    # grid 布局
+    # grid layout
     rows, cols = GRID_ROWS, GRID_COLS
     if rows * cols < n:
-        raise SystemExit(f"网格 {rows}×{cols} 放不下 {n} 张图，请调整 GRID_ROWS/COLS")
+        raise SystemExit(f"grid {rows}×{cols} cannot hold {n} figures; adjust GRID_ROWS/COLS")
     panels = []
     for i in range(n):
         r, c = divmod(i, cols)
@@ -210,11 +210,11 @@ def compose(svg_paths, out_path):
     for p in svg_paths:
         e = load_svg_entry(p)
         if e is None:
-            print(f"[警告] 无法解析，已跳过: {p}")
+            print(f"[warn] parse failed, skipped: {p}")
         else:
             entries.append(e)
     if not entries:
-        raise SystemExit("没有可用的 SVG 子图")
+        raise SystemExit("No usable SVG sub-figures")
 
     panels, total_w, total_h = compute_layout(len(entries))
 
@@ -228,7 +228,7 @@ def compose(svg_paths, out_path):
         parts.append(f'<rect width="100%" height="100%" fill="{BACKGROUND}"/>')
 
     for e, p in zip(entries, panels):
-        # 等比缩放到格子内并居中
+        # Scale proportionally to fit cell and center
         if p["w"] / p["h"] > e["aspect"]:
             dh = p["h"]
             dw = dh * e["aspect"]
@@ -251,30 +251,30 @@ def compose(svg_paths, out_path):
 
 
 def export_extra(svg_path):
-    """可选：用 cairosvg 导出 PDF/PNG"""
+    """Optional: export PDF/PNG with cairosvg"""
     try:
         import cairosvg
     except ImportError:
-        print("[提示] 未安装 cairosvg，跳过 PDF/PNG 导出（pip install cairosvg 可开启）")
+        print("[info] cairosvg not installed, skipping PDF/PNG export (pip install cairosvg to enable)")
         return
     base = os.path.splitext(svg_path)[0]
     if EXPORT_PDF:
         cairosvg.svg2pdf(url=svg_path, write_to=base + ".pdf")
-        print(f"已导出: {base}.pdf")
+        print(f"Exported: {base}.pdf")
     if EXPORT_PNG:
         cairosvg.svg2png(url=svg_path, write_to=base + ".png", dpi=PNG_DPI)
-        print(f"已导出: {base}.png")
+        print(f"Exported: {base}.png")
 
 
 def main():
     svg_paths = sys.argv[1:] or default_gallery_svgs()
     if not svg_paths:
         raise SystemExit(
-            "没有找到子图 SVG。请先运行 codeplot_v5.py 加入组图，"
-            "或手动指定: python compose_figure.py a.svg b.svg ...")
-    print(f"共 {len(svg_paths)} 张子图 | 布局: {LAYOUT}")
+            "No sub-figure SVG found. Please run codeplot.py and add to gallery first,"
+            "or specify manually: python compose_figure.py a.svg b.svg ...")
+    print(f"Total: {len(svg_paths)} sub-figures | layout: {LAYOUT}")
     w, h = compose(svg_paths, OUTPUT_SVG)
-    print(f"已生成: {OUTPUT_SVG}  ({w:.0f} × {h:.0f} pt)")
+    print(f"Generated: {OUTPUT_SVG}  ({w:.0f} × {h:.0f} pt)")
     if EXPORT_PDF or EXPORT_PNG:
         export_extra(OUTPUT_SVG)
 

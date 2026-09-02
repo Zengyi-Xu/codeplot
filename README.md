@@ -1,8 +1,8 @@
-# CodePlot — 代码驱动的实时画图工具
+# CodePlot — Code-Driven Real-Time Plotting Tool
 
-CodePlot 是一个基于 Python + Tkinter + Matplotlib 的本地 GUI 工具：左侧写代码，右侧实时出图。适合快速绘制科研图表、教学演示图和可复现的数据可视化。
+CodePlot is a local GUI tool based on Python + Tkinter + Matplotlib: write code on the left, see the plot on the right in real time. It is suitable for quick scientific charts, teaching demonstrations, and reproducible data visualization.
 
-## 运行
+## Run
 
 ```bash
 cd codeplot
@@ -10,65 +10,65 @@ pip install matplotlib numpy pillow
 python codeplot.py
 ```
 
-## 核心功能
+## Core Features
 
-- **左侧代码编辑器**：行号、语法高亮感知的编辑区，支持 `Ctrl+R` 运行、`Ctrl+S` 保存脚本。
-- **右侧实时渲染**：基于 Matplotlib 的 `FigureCanvasTkAgg`，代码运行后立即显示图表。
-- **内置模板**：正弦波、散点图、多组折线、柱状图等，下拉选择即可加载示例。
-- **图集模式（v5）**：
-  - 每张图独立编辑、精细调整；
-  - 点击「加入组图」把当前图收入图集；
-  - 图集总览按网格自动排版，并添加 `(a)(b)(c)...` 子图标签；
-  - 点击图集中的缩略图可重新加载代码继续编辑；
-  - 每张图同时保存 SVG（矢量）和 PNG（显示）。
-- **组合排版（v5）**：支持多段子图脚本 + 排版组合，一键生成论文级组图。
-- **导出**：支持保存脚本、导出单图 PNG/SVG、导出组图 PDF/PNG。
+- **Left code editor**: line-numbered, syntax-highlight-aware editing area; supports `Ctrl+R` to run and `Ctrl+S` to save the script.
+- **Right real-time rendering**: based on Matplotlib's `FigureCanvasTkAgg`; the chart updates immediately after running the code.
+- **Built-in templates**: sine wave, scatter plot, multi-line plot, bar chart, etc.; select from the dropdown to load an example.
+- **Gallery mode (v5)**:
+  - Each figure is edited independently and fine-tuned;
+  - Click "Add to Gallery" to save the current figure to the gallery;
+  - The overview arranges all figures in a grid and adds `(a)(b)(c)...` sub-figure labels automatically;
+  - Click a gallery thumbnail to reload its code and continue editing;
+  - Each figure is saved as SVG (vector) and PNG (display).
+- **Compose layout (v5)**: supports multi-section sub-figure scripts + layout composition; one-click generation of publication-ready combined figures.
+- **Export**: supports saving scripts, exporting single figures as PNG/SVG, and exporting combined figures as PDF/PNG.
 
-## 打包成 Windows 可执行文件（含开始菜单快捷方式）
+## Package as Windows Executable (with Start Menu shortcut)
 
 ```bat
 build_exe.bat
 ```
 
-打包流程：
-1. 自动生成 `icon.ico`（使用 📊 emoji）。
-2. 使用 PyInstaller 生成 `dist/CodePlot/CodePlot.exe`（无控制台窗口）。
-3. 运行 `create_shortcut.ps1` 在开始菜单创建 `CodePlot` 快捷方式。
+Build steps:
+1. Auto-generate `icon.ico` (using 📊 emoji).
+2. Use PyInstaller to produce `dist/CodePlot/CodePlot.exe` (no console window).
+3. Run `create_shortcut.ps1` to create a `CodePlot` shortcut in the Start Menu.
 
-打包完成后，可直接从开始菜单启动 CodePlot。
+After packaging, CodePlot can be launched directly from the Start Menu.
 
-## 文件结构
+## File Structure
 
 ```
 codeplot/
-├── codeplot.py              # 当前主程序（v5，图集排版模式）
-├── compose_figure.py        # 组合排版引擎
-├── compose_settings.json    # 组合排版默认设置
-├── icon.ico                 # 应用图标（📊 emoji）
-├── make_icon.py             # 图标生成脚本
-├── build_exe.bat            # Windows 打包脚本
-├── create_shortcut.ps1      # 创建开始菜单快捷方式
-├── README.md                # 本说明
-├── DEVLOG.md                # 开发日志
-└── archive/                 # 历史版本
-    ├── codeplot_v1.py       # 最初原型：左右分栏实时画图
-    ├── codeplot_v2.py       # 增加多标签、多脚本管理
-    ├── codeplot_v3.py       # 增加变量面板与模板系统
-    ├── codeplot_v4.py       # 增加组合排版与批量导出
-    ├── codeplot_v4_backup.py
+├── codeplot.py              # Current main program (v5, gallery layout mode)
+├── compose_figure.py        # Composition layout engine
+├── compose_settings.json    # Default compose layout settings
+├── icon.ico                 # App icon (📊 emoji)
+├── make_icon.py             # Icon generation script
+├── build_exe.bat            # Windows packaging script
+├── create_shortcut.ps1      # Create Start Menu shortcut
+├── README.md                # This file
+├── DEVLOG.md                # Development log
+└── archive/                 # Historical versions
+    ├── codeplot_v1.py       # First prototype: left/right split real-time plotting
+    ├── codeplot_v2.py       # Added tabs and multi-script management
+    ├── codeplot_v3.py       # Added variable panel and template system
+    ├── codeplot_v4.py       # Added compose layout and batch export
+    └── codeplot_v4_backup.py
 ```
 
-## 使用示例
+## Usage Example
 
-启动后选择「正弦波」模板，点击 ▶ 运行，即可在右侧看到曲线。修改代码后再次运行，图表会实时更新。
+After launch, select the "Sine Wave" template and click ▶ Run to see the curve on the right. Modify the code and run again; the chart will update in real time.
 
-## 依赖
+## Dependencies
 
 - Python 3.8+
 - matplotlib
 - numpy
-- pillow（可选，用于缩略图显示）
+- pillow (optional, for thumbnail display)
 
-## 许可证
+## License
 
 MIT
