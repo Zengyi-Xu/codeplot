@@ -29,7 +29,7 @@
       },
       "Box Plot": {
         "desc": "Box plot comparison of multiple data groups.",
-        "code": "# Box plot\nnp.random.seed(42)\ndata = [np.random.normal(0, std, 100) for std in range(1, 5)]\nlabels = ['A', 'B', 'C', 'D']\n\nax = fig.add_subplot(111)\nax.clear()\nbp = ax.boxplot(data, labels=labels, patch_artist=True)\ncolors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']\nfor patch, color in zip(bp['boxes'], colors):\n    patch.set_facecolor(color)\n    patch.set_alpha(0.7)\nax.set_title('Box plot', fontsize=14)\nax.set_ylabel('Value')\nax.grid(True, axis='y', alpha=0.3)\nfig.tight_layout()\n"
+        "code": "# Box plot\nnp.random.seed(42)\ndata = [np.random.normal(0, std, 100) for std in range(1, 5)]\nlabels = ['A', 'B', 'C', 'D']\n\nax = fig.add_subplot(111)\nax.clear()\nbp = ax.boxplot(data, tick_labels=labels, patch_artist=True)\ncolors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']\nfor patch, color in zip(bp['boxes'], colors):\n    patch.set_facecolor(color)\n    patch.set_alpha(0.7)\nax.set_title('Box plot', fontsize=14)\nax.set_ylabel('Value')\nax.grid(True, axis='y', alpha=0.3)\nfig.tight_layout()\n"
       }
     },
     "Scientific Charts": {

@@ -312,7 +312,7 @@ labels = ['A', 'B', 'C', 'D']
 
 ax = fig.add_subplot(111)
 ax.clear()
-bp = ax.boxplot(data, labels=labels, patch_artist=True)
+bp = ax.boxplot(data, tick_labels=labels, patch_artist=True)
 colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']
 for patch, color in zip(bp['boxes'], colors):
     patch.set_facecolor(color)
