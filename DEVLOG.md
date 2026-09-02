@@ -1,42 +1,42 @@
-# CodePlot 开发日志
+# CodePlot Development Log
 
-## 2026-07-17 — v1 原型
+## 2026-07-17 — v1 Prototype
 
-- 用 Python + Tkinter + Matplotlib 搭建左右分栏界面。
-- 左侧代码编辑器带行号，右侧 `FigureCanvasTkAgg` 实时渲染。
-- 支持 `Ctrl+R` 运行、`Ctrl+S` 保存脚本。
+- Built a left/right split interface with Python + Tkinter + Matplotlib.
+- Left code editor with line numbers, right `FigureCanvasTkAgg` real-time rendering.
+- Supports `Ctrl+R` to run and `Ctrl+S` to save scripts.
 
-## 2026-07-17 — v2 多标签与文件管理
+## 2026-07-17 — v2 Tabs and File Management
 
-- 增加多标签页，支持同时编辑多个脚本。
-- 增加文件打开/保存对话框。
-- 优化中文字体配置，默认尝试 Microsoft YaHei / SimHei。
+- Added multi-tab support for editing multiple scripts at the same time.
+- Added file open/save dialogs.
+- Optimized font configuration; defaults to Microsoft YaHei / SimHei.
 
-## 2026-07-17 — v3 模板与变量面板
+## 2026-07-17 — v3 Templates and Variable Panel
 
-- 增加内置模板系统（正弦波、散点、折线、柱状图等）。
-- 增加变量监视面板，方便调试脚本中的数组变量。
-- 改进错误提示，运行异常时在状态栏显示行号信息。
+- Added built-in template system (sine wave, scatter, line, bar chart, etc.).
+- Added variable watch panel for debugging array variables in scripts.
+- Improved error tips; displays line-number information in the status bar on runtime exceptions.
 
-## 2026-07-20 — v4 组合排版与批量导出
+## 2026-07-20 — v4 Compose Layout and Batch Export
 
-- 引入组合排版引擎 `compose_figure.py`。
-- 支持多段子图脚本 + 排版组合块，一键生成 `(a)(b)(c)` 标注的组图。
-- 增加批量导出 PDF/PNG、设置面板持久化。
+- Introduced the `compose_figure.py` composition engine.
+- Supports multi-section sub-figure scripts + compose blocks; one-click generation of `(a)(b)(c)` labeled combined figures.
+- Added batch PDF/PNG export and persistent settings panel.
 
-## 2026-07-31 — v5 图集模式
+## 2026-07-31 — v5 Gallery Mode
 
-- 核心重构为「单图编辑 + 图集收集 + 总览排版」三步工作流：
-  1. 代码只生成一张图，便于精细调整；
-  2. 「加入组图」把当前图保存到图集，同时生成 SVG 和 PNG；
-  3. 总览页按数量自动计算最佳网格布局，并叠加子图标签。
-- 图集数据存储在 `.codeplot_gallery/` 目录，索引为 JSON 文件。
-- 点击图集缩略图可重新加载历史代码继续编辑。
-- 组合排版功能保留，可通过 `# ═══ 排版组合 ═══` 块调用。
+- Core refactor to a "single-figure edit + gallery collection + overview layout" workflow:
+  1. Code generates only one figure for fine tuning;
+  2. "Add to Gallery" saves the current figure to the gallery and generates SVG and PNG at the same time;
+  3. The overview page automatically computes the best grid layout and overlays sub-figure labels.
+- Gallery data is stored in the `.codeplot_gallery/` directory; the index is a JSON file.
+- Clicking a gallery thumbnail reloads historical code for continued editing.
+- Compose layout is preserved and can be invoked via the `# ═══ Compose Layout ═══` block.
 
-## 后续可优化方向
+## Future Improvements
 
-- 增加代码自动补全和语法高亮。
-- 支持深色主题。
-- 导出时可选 DPI、图片尺寸、字体嵌入。
-- 增加更多统计/机器学习可视化模板。
+- Add code autocomplete and syntax highlighting.
+- Support dark theme.
+- Optional DPI, image size, and font embedding on export.
+- Add more statistics / machine-learning visualization templates.
