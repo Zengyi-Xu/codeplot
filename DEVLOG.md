@@ -34,6 +34,20 @@
 - Clicking a gallery thumbnail reloads historical code for continued editing.
 - Compose layout is preserved and can be invoked via the `# ═══ Compose Layout ═══` block.
 
+## 2026-09-27 — v5.1 Publication Templates
+
+- Added `publication_templates.py` with a new "Publication" template category (7 templates):
+  line plot, BER curve (semilog), spectrum/frequency response, zoom inset, dual y-axis,
+  heatmap + colorbar, bar + error bars.
+- Unified journal style preamble fixes the recurring layout issues:
+  - Fixed 3.5 in single-column figure size + explicit font sizes -> text never ends up too small;
+  - Constrained layout + inward ticks + frameless legends -> no overlapping components;
+  - `svg.fonttype='path'` + `pdf.fonttype=42` -> exported SVG/PDF never lose fonts;
+  - Font list falls back from Arial to Microsoft YaHei / SimHei for Chinese labels.
+- Every template was rendered headlessly and visually inspected for overlaps/clipping.
+- Templates are merged into `BUILTIN_TEMPLATES` at runtime; existing user `templates.json`
+  picks them up automatically on next launch.
+
 ## Future Improvements
 
 - Add code autocomplete and syntax highlighting.
