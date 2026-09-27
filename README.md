@@ -15,6 +15,11 @@ python codeplot.py
 - **Left code editor**: line-numbered, syntax-highlight-aware editing area; supports `Ctrl+R` to run and `Ctrl+S` to save the script.
 - **Right real-time rendering**: based on Matplotlib's `FigureCanvasTkAgg`; the chart updates immediately after running the code.
 - **Built-in templates**: sine wave, scatter plot, multi-line plot, bar chart, etc.; select from the dropdown to load an example.
+- **Publication templates (v5.1)**: a "Publication" template category designed to fix the three most common layout problems —
+  - *Fonts too small*: fixed physical figure size (3.5 in, journal single-column) + explicit font sizes, so text proportions are deterministic;
+  - *Overlapping parts*: constrained layout, inward ticks, frameless legends, headroom left for annotations;
+  - *Missing fonts*: `svg.fonttype='path'` (text saved as vector outlines — SVG never depends on installed fonts), `pdf.fonttype=42` (TrueType embedded), font list falls back from Arial to CJK fonts;
+  - Includes line plot, BER curve (semilog), spectrum, zoom inset, dual y-axis, heatmap + colorbar, and bar + error bars, all in the Okabe-Ito colorblind-safe palette.
 - **Gallery mode (v5)**:
   - Each figure is edited independently and fine-tuned;
   - Click "Add to Gallery" to save the current figure to the gallery;
@@ -42,6 +47,7 @@ After packaging, CodePlot can be launched directly from the Start Menu.
 ```
 codeplot/
 ├── codeplot.py              # Current main program (v5, gallery layout mode)
+├── publication_templates.py # Publication-quality template set (journal style)
 ├── compose_figure.py        # Composition layout engine
 ├── compose_settings.json    # Default compose layout settings
 ├── icon.ico                 # App icon (📊 emoji)

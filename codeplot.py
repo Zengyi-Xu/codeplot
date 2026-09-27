@@ -394,6 +394,15 @@ fig.tight_layout()
 }
 
 
+# Publication-quality templates live in a separate module so they stay
+# maintainable; merge them into the builtin set (degrade gracefully if missing).
+try:
+    from publication_templates import PUBLICATION_TEMPLATES
+    BUILTIN_TEMPLATES.update(PUBLICATION_TEMPLATES)
+except Exception:
+    pass
+
+
 # ════════════════════════════════════════
 # Template manager (simplified)
 # ════════════════════════════════════════
